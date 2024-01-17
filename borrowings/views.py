@@ -1,6 +1,11 @@
-from rest_framework import mixins
+from datetime import date
+
+from django.db import transaction
+from rest_framework import mixins, status
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from borrowings.filters import BorrowingsFilter
@@ -9,6 +14,7 @@ from borrowings.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
     BorrowingDetailSerializer,
+    BorrowingReturnSerializer,
 )
 
 
@@ -42,6 +48,9 @@ class BorrowingsViewSet(
         if self.action == "retrieve":
             return BorrowingDetailSerializer
 
+        if self.action == "return_borrowing":
+            return BorrowingReturnSerializer
+
         return BorrowingSerializer
 
     def perform_create(self, serializer):
@@ -55,3 +64,30 @@ class BorrowingsViewSet(
             )
 
         serializer.save(user=self.request.user)
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="return",
+    )
+    def return_borrowing(self, request, pk=None):
+        """Endpoint for returning borrowing."""
+        borrowing = self.get_object()
+
+        if borrowing.actual_return_date:
+            return Response(
+                {
+                    "detail": "This borrowing has been already returned. You cannot return it twice."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        with transaction.atomic():
+            book = borrowing.book
+            book.inventory += 1
+            book.save()
+
+            borrowing.actual_return_date = date.today()
+            borrowing.save()
+
+        return Response(status=status.HTTP_200_OK)
