@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from django.conf import settings
 from django.core.validators import MinValueValidator
@@ -10,7 +10,8 @@ from books.models import Book
 class Borrowing(models.Model):
     borrow_date = models.DateField(auto_now_add=True)
     expected_return_date = models.DateField(
-        validators=[MinValueValidator(limit_value=date.today)]
+        validators=[MinValueValidator(limit_value=date.today)],
+        default=date.today() + timedelta(weeks=2),
     )
     actual_return_date = models.DateField(
         null=True, blank=True, validators=[MinValueValidator(limit_value=date.today)]

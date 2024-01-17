@@ -1,5 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import mixins
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.viewsets import GenericViewSet
 
 from borrowings.models import Borrowing
 from borrowings.serializers import (
@@ -9,7 +11,12 @@ from borrowings.serializers import (
 )
 
 
-class BorrowingsViewSet(viewsets.ModelViewSet):
+class BorrowingsViewSet(
+    GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+):
     permission_classes = [IsAuthenticated]
     queryset = Borrowing.objects.all()
 
@@ -21,3 +28,15 @@ class BorrowingsViewSet(viewsets.ModelViewSet):
             return BorrowingDetailSerializer
 
         return BorrowingSerializer
+
+    def perform_create(self, serializer):
+        book = serializer.validated_data["book"]
+        if book.inventory > 0:
+            book.inventory -= 1
+            book.save()
+        else:
+            raise ValidationError(
+                "There are no books left in inventory. Cannot borrow."
+            )
+
+        serializer.save(user=self.request.user)
