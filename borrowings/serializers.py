@@ -15,10 +15,17 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "book",
             "user",
         )
+        read_only_fields = (
+            "id",
+            "user",
+        )
 
 
 class BorrowingListSerializer(BorrowingSerializer):
-    book = serializers.SlugRelatedField(many=True, read_only=True, slug_field="title")
+    book = serializers.SlugRelatedField(many=False, read_only=True, slug_field="title")
+    user = serializers.SlugRelatedField(
+        many=False, read_only=True, slug_field="full_name"
+    )
 
 
 class BorrowingDetailSerializer(BorrowingSerializer):
