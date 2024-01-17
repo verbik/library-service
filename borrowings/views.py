@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from borrowings.models import Borrowing
 from borrowings.serializers import (
@@ -9,6 +10,7 @@ from borrowings.serializers import (
 
 
 class BorrowingsViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = Borrowing.objects.all()
 
     def get_serializer_class(self):
