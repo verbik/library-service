@@ -31,7 +31,10 @@ class BorrowingsViewSet(
 
     def perform_create(self, serializer):
         book = serializer.validated_data["book"]
-        if book.inventory == 0:
+        if book.inventory > 0:
+            book.inventory -= 1
+            book.save()
+        else:
             raise ValidationError(
                 "There are no books left in inventory. Cannot borrow."
             )
