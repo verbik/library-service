@@ -30,3 +30,11 @@ class BorrowingListSerializer(BorrowingSerializer):
 
 class BorrowingDetailSerializer(BorrowingSerializer):
     book = BookSerializer(many=False, read_only=True)
+
+
+class BorrowingReturnSerializer(serializers.ModelSerializer):
+    return_borrowing = serializers.BooleanField()
+
+    class Meta:
+        model = Borrowing
+        fields = ("return_borrowing",)
