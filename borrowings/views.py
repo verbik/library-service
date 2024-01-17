@@ -28,6 +28,11 @@ class BorrowingsViewSet(
         if not user.is_staff:
             queryset = queryset.filter(user=user)
 
+        if user.is_staff:
+            customer_id = self.request.query_params.get("user_id")
+            if customer_id:
+                queryset = queryset.filter(user__id=customer_id)
+
         return queryset
 
     def get_serializer_class(self):
