@@ -16,10 +16,20 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ("id", "username", "email", "password")
+        fields = ("id", "email", "first_name", "last_name", "password")
 
     def create(self, validated_data):
         user = super().create(validated_data)
         user.set_password(validated_data["password"])
         user.save()
         return user
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        min_length=4, write_only=True, required=True, style={"input_type": "password"}
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ("id", "email", "first_name", "last_name", "password", "is_staff")
