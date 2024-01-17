@@ -18,7 +18,15 @@ class BorrowingsViewSet(
     mixins.CreateModelMixin,
 ):
     permission_classes = [IsAuthenticated]
-    queryset = Borrowing.objects.all()
+
+    def get_queryset(self):
+        queryset = Borrowing.objects.prefetch_related("book", "user")
+
+        user = self.request.user
+        if not user.is_staff:
+            queryset = queryset.filter(user=user)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":
