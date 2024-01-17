@@ -4,7 +4,7 @@ from rest_framework import routers
 from borrowings.views import BorrowingsViewSet
 
 router = routers.DefaultRouter()
-router.register("", BorrowingsViewSet)
+router.register("", BorrowingsViewSet, basename="borrowings")
 
 urlpatterns = router.urls
 

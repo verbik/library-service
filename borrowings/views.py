@@ -3,6 +3,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 
+from borrowings.filters import BorrowingsFilter
 from borrowings.models import Borrowing
 from borrowings.serializers import (
     BorrowingSerializer,
@@ -18,7 +19,21 @@ class BorrowingsViewSet(
     mixins.CreateModelMixin,
 ):
     permission_classes = [IsAuthenticated]
-    queryset = Borrowing.objects.all()
+    filterset_class = BorrowingsFilter
+
+    def get_queryset(self):
+        queryset = Borrowing.objects.prefetch_related("book", "user")
+
+        user = self.request.user
+        if not user.is_staff:
+            queryset = queryset.filter(user=user)
+
+        if user.is_staff:
+            customer_id = self.request.query_params.get("user_id")
+            if customer_id:
+                queryset = queryset.filter(user__id=customer_id)
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":
