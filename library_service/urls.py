@@ -16,11 +16,18 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework import routers
+
+from books.urls import router as book_router
+from borrowings.urls import router as borrowings_router
+
+router = routers.DefaultRouter()
+router.registry.extend(book_router.registry)
+router.registry.extend(borrowings_router.registry)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("__debug__/", include("debug_toolbar.urls")),
-    path("books/", include("books.urls", namespace="books")),
+    path("api/", include(router.urls)),
     path("users/", include("user.urls", namespace="user")),
-    path("borrowings/", include("borrowings.urls", namespace="borrowings")),
 ]
