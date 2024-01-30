@@ -16,6 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
 from rest_framework import routers
 
 from books.urls import router as book_router
@@ -30,4 +35,10 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path("api/", include(router.urls)),
     path("users/", include("user.urls", namespace="user")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/schema/swagger/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
 ]
