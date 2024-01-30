@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 from .telegram_helper import send_telegram_message
 from .models import Borrowing
 
-
 load_dotenv()
 
 

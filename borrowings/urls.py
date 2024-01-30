@@ -4,8 +4,6 @@ from rest_framework import routers
 from borrowings.views import BorrowingsViewSet
 
 router = routers.DefaultRouter()
-router.register("", BorrowingsViewSet, basename="borrowings")
-
-urlpatterns = router.urls
+router.register("borrowings", BorrowingsViewSet, basename="borrowings")
 
 app_name = "borrowings"
