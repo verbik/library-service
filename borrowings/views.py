@@ -34,6 +34,7 @@ class BorrowingsViewSet(
 ):
     permission_classes = [IsAuthenticated]
     filterset_class = BorrowingsFilter
+    pagination_class = BorrowingPagination
 
     def get_queryset(self):
         queryset = Borrowing.objects.prefetch_related("book", "user")
